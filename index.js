@@ -55,5 +55,46 @@ server.get('/api/users/:id', (req, res) => {
         })
 })
 
+server.delete('/api/users/:id', (req, res) => {
+    const {id} = req.params;
+    
+    db
+        .remove(id)
+        .then(removed => {
+            if(removed === 0){
+                res.status(404).json({ errorMessage: 'The user with the specified ID does not exist.'})
+            } else {
+                res.status(200).json({ message: `user was removed` });
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ errorMessage: 'The user could not be removed'})
+        })
+})
+
+server.put('/api/users/:id', (req, res) => {
+    const {id} = req.params;
+    const updateInfo = req.body;
+
+    if (req.body.name === undefined || req.body.bio === undefined) {
+        res.status.apply(400).json({ errorMessage: 'Please provide name and bio for the user.' })
+    } else {
+        db
+            .update(id, updateInfo)
+            .then(updated => {
+                if (updated === 0) {
+                    res.status(404).json({ errorMessage: 'The user with the specified ID does not exist.' })
+                } else {
+                    res.status(200).json(updateInfo);
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(500).json({ errorMessage: 'The user could not be updated' })
+            })
+    }
+})
+
 const port = 5000;
 server.listen(port, () => console.log(`\n** API on port ${port} \n`));
