@@ -10,15 +10,19 @@ server.use(express.json());
 server.post('/api/users', (req, res) => {
     const dbInfo = req.body;
 
-    db
-    .insert(dbInfo)
-    .then(created => {
-        res.status(201).json(created);
-    })
-    .catch(err => {
-        console.log(err);
-        res.status(500).json({ errorMessage: 'oops' });
-    })
+    if(dbInfo.name === undefined || dbInfo.bio === undefined){
+        res.status(400).json({ errorMessage: 'Please provide name and bio for the user.'})
+    } else {
+        db
+            .insert(dbInfo)
+            .then(created => {
+                res.status(201).json(created);
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(500).json({ errorMessage: 'There was an error while saving the user to the database' });
+            })
+    }
 })
 
 server.get('/api/users', (req, res) => {
