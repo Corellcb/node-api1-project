@@ -7,6 +7,20 @@ const server = express();
 
 server.use(express.json());
 
+server.post('/api/users', (req, res) => {
+    const dbInfo = req.body;
+
+    db
+    .insert(dbInfo)
+    .then(created => {
+        res.status(201).json(created);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({ errorMessage: 'oops' });
+    })
+})
+
 server.get('/api/users', (req, res) => {
     db
         .find()
@@ -19,18 +33,15 @@ server.get('/api/users', (req, res) => {
         })
 })
 
-server.post('api/users', (req, res) => {
-    const dbInfo = req.body;
+server.get('/api/users/:id', (req, res) => {
+    const {id} = req.params;
 
-    db
-        .insert(dbInfo)
-        .then(db => {
-            res.status(201).json(db);
-        })
-        .catch(err => {
-            console.log(err);
-            res.status(500).json({ errorMessage: 'oops' });
-        })
+    db.findById(id).then(db => {
+        res.status(200).json(db)
+    }).catch(err => {
+        console.log(err);
+        res.status(500).json({ errorMessage: 'oops' });
+    })
 })
 
 const port = 5000;
